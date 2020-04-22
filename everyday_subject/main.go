@@ -202,3 +202,139 @@ type MyInt1 int 是基于类型 int 创建了新类型 MyInt1，type MyInt2 = in
 所以，第 10 行代码相当于是将 int 类型的变量赋值给 MyInt1 类型的变量，Go 是强类型语言，编译当然不通过；
 而 MyInt2 只是 int 的别名，本质上还是 int，可以赋值。
 */
+
+func day07() {
+	//1、字符串的拼接
+	str := 'abc' + '123'
+	str := "abc" + "123"
+	str := '123' + "abc"
+	fmt.Sprintf("abc%d", 123)
+
+	//2、下面这段代码能否编译通过？如果可以，输出什么？
+	const (
+		x = iota
+		_
+		y
+		z = "zz"
+		k
+		p = iota
+	)
+	fmt.Println(x, y, z, k, p)
+
+	/**
+	3、下面赋值正确的是()
+
+	A. var x = nil
+	B. var x interface{} = nil
+	C. var x string = nil
+	D. var x error = nil
+	*/
+}
+
+/**
+1、除了以上两种连接方式，还有 strings.Join()、buffer.WriteString()等
+2、https://www.cnblogs.com/zsy/p/5370052.html
+3、参考答案及解析：BD。知识点：nil 值。nil 只能赋值给指针、func、interface、chan、map 或 slice 类型的变量。
+强调下 D 选项的 error 类型，它是一种内置接口类型，看下方贴出的源码就知道，所以 D 是对的。
+
+	type error interface {
+		Error() string
+	}
+*/
+
+func day08() {
+	/**
+	1.关于init函数，下面说法正确的是()
+
+	A. 一个包中，可以包含多个 init 函数；
+	B. 程序编译时，先执行依赖包的 init 函数，再执行 main 包内的 init 函数；
+	C. main 包中，不能有 init 函数；
+	D. init 函数可以被其他函数调用；
+	*/
+	//2、下面这段代码输出什么以及原因？
+	day08_2()
+	//3.下面这段代码能否编译通过？如果可以，输出什么？
+	day08_3()
+}
+func hello() []string {
+	return nil
+}
+func day08_2() {
+	h := hello
+	fmt.Printf("%T \n %v \n", h, h)
+	if h == nil {
+		fmt.Println("nil")
+	} else {
+		fmt.Println("not nil")
+	}
+}
+
+func GetValue() int {
+	return 1
+}
+func day08_3() {
+	i := GetValue()
+	switch i.(type) {
+	case int:
+		println("int")
+	case string:
+		println("string")
+	case interface{}:
+		println("interface")
+	default:
+		println("unknown")
+	}
+}
+
+//参开答案及解析
+/**
+1、AB
+关于 init() 函数有几个需要注意的地方：
+
+1、init() 函数是用于程序执行前做包的初始化的函数，比如初始化包里的变量等;
+2、一个包可以有多个 init() 函数,一个源文件也可以包含多个 init() 函数；
+3、同一个包中多个 init() 函数的执行顺序没有明确定义，但是不同包的init函数是根据包导入的依赖关系决定的（看下图）;
+4、init() 函数在代码中不能被显示调用、不能被引用（赋值给函数变量），否则出现编译错误;
+5、一个包被引用多次，如 A import B,C import B,A import C，B 被引用多次，但 B 包只会初始化一次；
+6、引入包，不可出现死循坏。即 A import B,B import A，这种情况编译失败；
+
+2、B。这道题目里面，是将 hello() 赋值给变量 h，而不是函数的返回值，所以输出 not nil。
+3、编译失败。考点：类型选择，类型选择的语法形如：i.(type)，其中 i 是接口，type 是固定关键字，需要注意的是，只有接口类型才可以使用类型选择
+*/
+
+func hello1(num ...int) {
+	num[0] = 18
+}
+func day09() {
+	i := []int{5, 6, 7}
+	hello1(i...)
+	fmt.Println(i[0])
+}
+//参考答案及解析：18。知识点：可变函数，本质上，函数的可变参数是通过切片来实现的。
+
+func day10() {
+	//1.下面这段代码输出什么？
+	a := [5]int{1, 2, 3, 4, 5}
+	t := a[3:4:4]
+	fmt.Println(t[0])
+
+	//2.下面这段代码输出什么？
+	a := [2]int{5, 6}
+	b := [3]int{5, 6}
+	if a == b {
+		fmt.Println("equal")
+	} else {
+		fmt.Println("not equal")
+	}
+}
+/**
+	1、参考答案及解析：B。
+	知识点：操作符 [i,j]。基于数组（切片）可以使用操作符 [i,j] 创建新的切片，从索引 i，到索引 j 结束，截取已有数组（切片）的任意部分，返回新的切片，
+				新切片的值包含原数组（切片）的 i 索引的值，但是不包含 j 索引的值。i、j 都是可选的，i 如果省略，默认是 0，j 如果省略，默认是原数组（切片）的长度。
+				i、j 都不能超过这个长度值。
+		假如底层数组的大小为 k，截取之后获得的切片的长度和容量的计算方法：长度：j-i，容量：k-i。
+		截取操作符还可以有第三个参数，形如 [i,j,k]，第三个参数 k 用来限制新切片的容量，但不能超过原数组（切片）的底层数组大小。截取获得的切片的长度和容量分别是：j-i、k-i。
+		所以例子中，切片 t 为 [4]，长度和容量都是 1。
+	2、编译错误
+		Go 中的数组是值类型，可比较，另外一方面，数组的长度也是数组类型的组成部分，所以 a 和 b 是不同的类型，是不能比较的，所以编译错误。
+ */
