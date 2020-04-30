@@ -60,9 +60,9 @@ func day03() {
 	fun2()
 
 	//2、下面的代码有什么缺陷
-	fun3 := func(x, y int) (sum int, error) {
+	/*fun3 := func(x, y int) (sum int, error) {
 		return x + y, nil
-	}
+	}*/
 
 	//3.new() 与 make() 的区别
 }
@@ -91,30 +91,30 @@ make(T,args) 返回初始化之后的 T 类型的值，这个值并不是 T 类�
 // day04
 func day04() {
 	//1.下面这段代码能否通过编译，不能的话原因是什么；如果能，输出什么。
-	fun1 := func() {
+	/*fun1 := func() {
 		list := new([]int)
 		list = append(list, 1)
 	}
-	fun1()
+	fun1()*/
 
 	//2.下面这段代码能否通过编译，如果可以，输出什么？
-	fun2 := func() {
+	/*fun2 := func() {
 		s1 := []int{1, 2, 3}
 		s2 := []int{4, 5}
 		s1 = append(s1, s2)
 		fmt.Println(s1)
 	}
-	fun2()
+	fun2()*/
 
 	//3.下面这段代码能否通过编译，如果可以，输出什么？
-	var (
+	/*var (
 		size := 1024
 		maxSize = size * 2
 	)
 	fun3 := func() {
 		fmt.Println(size, maxSize)
 	}
-	fun3()
+	fun3()*/
 }
 
 /**
@@ -205,10 +205,10 @@ type MyInt1 int 是基于类型 int 创建了新类型 MyInt1，type MyInt2 = in
 
 func day07() {
 	//1、字符串的拼接
-	str := 'abc' + '123'
+	/*str := 'abc' + '123'
 	str := "abc" + "123"
 	str := '123' + "abc"
-	fmt.Sprintf("abc%d", 123)
+	fmt.Sprintf("abc%d", 123)*/
 
 	//2、下面这段代码能否编译通过？如果可以，输出什么？
 	const (
@@ -273,7 +273,7 @@ func GetValue() int {
 	return 1
 }
 func day08_3() {
-	i := GetValue()
+	/*i := GetValue()
 	switch i.(type) {
 	case int:
 		println("int")
@@ -283,7 +283,7 @@ func day08_3() {
 		println("interface")
 	default:
 		println("unknown")
-	}
+	}*/
 }
 
 //参开答案及解析
@@ -320,13 +320,13 @@ func day10() {
 	fmt.Println(t[0])
 
 	//2.下面这段代码输出什么？
-	a := [2]int{5, 6}
+	/*a := [2]int{5, 6}
 	b := [3]int{5, 6}
 	if a == b {
 		fmt.Println("equal")
 	} else {
 		fmt.Println("not equal")
-	}
+	}*/
 }
 
 /**
@@ -399,20 +399,107 @@ func day14() {
 
 //参考代码及解析：C。知识点：常量，Go 语言中的字符串是只读的。
 
-func day15()  {
+func day15() {
 	//全对，跳过
 }
 
-func day16()  {
+func day16() {
 	/**
 	1.切片 a、b、c 的长度和容量分别是多少？
-	func main() {
 	    s := [3]int{1, 2, 3}
 	    a := s[:0]//0,3
 	    b := s[:2]//2,3
 	    c := s[1:2:cap(s)]//1,2
-	}
-	 */
+	*/
 
 }
+
 //参考答案见day10
+
+func day17() {
+	//下面代码输出什么？
+	/**
+	func increaseA() int {
+	    var i int
+	    defer func() {
+	        i++
+	    }()
+	    return i
+	}
+
+	func increaseB() (r int) {
+	    defer func() {
+	        r++
+	    }()
+	    return r
+	}
+
+	func main() {
+	    fmt.Println(increaseA())
+	    fmt.Println(increaseB())
+	}
+	A. 1 1
+	B. 0 1 √
+	C. 1 0
+	D. 0 0
+	*/
+}
+func day18() {
+	/**
+	1.f1()、f2()、f3() 函数分别返回什么？
+
+	func f1() (r int) {
+	    defer func() {
+	        r++
+	    }()
+	    return 0
+	}
+
+	func f2() (r int) {
+	    t := 5
+	    defer func() {
+	        t = t + 5
+	    }()
+	    return t
+	}
+
+	func f3() (r int) {
+	    defer func(r int) {
+	        r = r + 5
+	    }(r)
+	    return 1
+	}
+	*/
+}
+
+//17 18两天的题详情看https://mp.weixin.qq.com/s/Hm8MdrqYgCQPQ4A1nrv4sw
+
+type Person struct {
+	age int
+}
+
+func day19() {
+	//下面代码段输出什么？
+	person := &Person{28}
+	// 1.
+	defer fmt.Println(person.age) //29
+	// 2.
+	defer func(p *Person) {
+		fmt.Println(p.age)
+	}(person)
+	// 3.
+	defer func() {
+		fmt.Println(person.age) //
+	}()
+	person.age = 29
+}
+
+/**
+参考答案及解析：29 29 28。变量 person 是一个指针变量 。
+
+1.person.age 此时是将 28 当做 defer 函数的参数，会把 28 缓存在栈中，等到最后执行该 defer 语句的时候取出，即输出 28；
+
+2.defer 缓存的是结构体 Person{28} 的地址，最终 Person{28} 的 age 被重新赋值为 29，所以 defer 语句最后执行的时候，依靠缓存的地址取出的 age 便是 29，即输出 29；
+
+3.闭包引用，输出 29；
+*/
