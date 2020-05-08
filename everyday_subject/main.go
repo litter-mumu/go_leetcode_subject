@@ -503,3 +503,61 @@ func day19() {
 
 3.闭包引用，输出 29；
 */
+
+func day20() {
+	// 下面代码输出什么？
+	person := &Person{28}
+	// 1.
+	defer fmt.Println(person.age)
+	// 2.
+	defer func(p *Person) {
+		fmt.Println(p.age)
+	}(person)
+	// 3.
+	defer func() {
+		fmt.Println(person.age)
+	}()
+	person = &Person{29}
+}
+
+/**
+2 defer 缓存的是结构体 Person{28} 的地址，这个地址指向的结构体没有被改变，
+最后 defer 语句后面的函数执行的时候取出仍是 28；
+*/
+
+func day21() {
+	/**
+	//1、以下输出什么？
+	s := make([]int, 0, 1)
+	s1 := append(s, 1)
+	s2 := append(s, 2)
+	s3 := append(s2, 1)
+	 */
+
+	//2. A、B、C、D 哪些选项有语法错误？
+	/**
+	type S struct {
+	}
+
+	func f(x interface{}) {
+	}
+
+	func g(x *interface{}) {
+	}
+
+	func main() {
+	    s := S{}
+	    p := &s
+	    f(s) //A
+	    g(s) //B
+	    f(p) //C
+	    g(p) //D
+	}
+	 */
+}
+/**
+2.参考答案及解析：BD。函数参数为 interface{} 时可以接收任何类型的参数，
+包括用户自定义类型等，即使是接收指针类型也用 interface{}，而不是使用 *interface{}。
+
+永远不要使用一个指针指向一个接口类型，因为它已经是一个指针。
+ */
